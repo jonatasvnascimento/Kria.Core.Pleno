@@ -1,25 +1,31 @@
 using Kria.Core.Pleno.Lib.Interfaces.BLL;
+using Kria.Core.Pleno.Middleware;
 
 namespace Kria.Core.Pleno
 {
     public class Worker(
         ILogger<Worker> logger,
-        IServiceScopeFactory scopeFactory
+        IServiceScopeFactory scopeFactory,
+        GlobalErrorHandler errorHandlingMiddleware
     ) : BackgroundService
     {
         private readonly ILogger<Worker> _logger = logger;
         private readonly IServiceScopeFactory _scopeFactory = scopeFactory;
+        private readonly GlobalErrorHandler _errorHandlingMiddleware = errorHandlingMiddleware;
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                if (_logger.IsEnabled(LogLevel.Information))
+                await _errorHandlingMiddleware.HandleAsync(async () =>
                 {
-                    _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
-                }
-                DadosTeste();
-                await Task.Delay(10000, stoppingToken);
+                    if (_logger.IsEnabled(LogLevel.Information))
+                    {
+                        _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
+                    }
+                    await Task.Delay(2000, stoppingToken);
+                    DadosTeste();
+                });
             }
         }
        
