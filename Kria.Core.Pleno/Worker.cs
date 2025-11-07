@@ -1,13 +1,14 @@
+using Kria.Core.Pleno.Lib.Interfaces.BLL;
+
 namespace Kria.Core.Pleno
 {
-    public class Worker : BackgroundService
+    public class Worker(
+        ILogger<Worker> logger,
+        IServiceScopeFactory scopeFactory
+    ) : BackgroundService
     {
-        private readonly ILogger<Worker> _logger;
-
-        public Worker(ILogger<Worker> logger)
-        {
-            _logger = logger;
-        }
+        private readonly ILogger<Worker> _logger = logger;
+        private readonly IServiceScopeFactory _scopeFactory = scopeFactory;
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
@@ -17,7 +18,22 @@ namespace Kria.Core.Pleno
                 {
                     _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
                 }
-                await Task.Delay(1000, stoppingToken);
+                DadosTeste();
+                await Task.Delay(10000, stoppingToken);
+            }
+        }
+       
+        private void DadosTeste()
+        {
+
+            using var scope = _scopeFactory.CreateScope();
+            var pedagioBLL = scope.ServiceProvider.GetRequiredService<IPedagioBLL>();
+
+            Console.WriteLine("Listando Pedágios:");
+            var pedagios = pedagioBLL.ObterTodos().ToList();
+            foreach (var pedagio in pedagios)
+            {
+                Console.WriteLine($"- {pedagio.IdTransacao}");
             }
         }
     }

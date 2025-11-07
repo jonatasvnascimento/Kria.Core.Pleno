@@ -10,13 +10,13 @@ using System.Threading.Tasks;
 
 namespace Kria.Core.Pleno.Lib.DAO
 {
-    public class PedagioDAO(MongoDbContext context) : IPedagioDAO
+    public class PedagioDAO(IMongoDbContext context) : IPedagioDAO
     {
-        private readonly IMongoCollection<Pedagio> _context = context.GetCollection<Pedagio>("Pedagios");
+        private readonly IMongoCollection<TabTransacoes> _context = context.GetCollection<TabTransacoes>("TabTransacoes");
 
-        public List<Pedagio> ObterTodos()
+        public IQueryable<TabTransacoes> ObterTodos()
         {
-            return _context.AsQueryable().ToList();
+            return _context.AsQueryable();
         }
     }
 }

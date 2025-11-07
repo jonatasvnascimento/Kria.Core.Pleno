@@ -1,4 +1,4 @@
-﻿using Kria.Core.Pleno.Lib.Entidades;
+﻿using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace Kria.Core.Pleno.Lib.Interfaces.DAO
 {
-    public interface IPedagioDAO
+    public interface IMongoDbContext
     {
-        public IQueryable<TabTransacoes> ObterTodos();
+        public IMongoCollection<T> GetCollection<T>(string collectionName);
     }
 }
