@@ -9,6 +9,6 @@ namespace Kria.Core.Pleno.Lib.Interfaces.BLL
 {
     public interface IPedagioBLL
     {
-        public IQueryable<TabTransacoes> ObterTodos();
+        public void ProcessarLotePedagio();
     }
 }

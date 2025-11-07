@@ -1,4 +1,5 @@
 using Kria.Core.Pleno.Lib.Interfaces.BLL;
+using Kria.Core.Pleno.Lib.Interfaces.DAO;
 using Kria.Core.Pleno.Middleware;
 
 namespace Kria.Core.Pleno
@@ -6,7 +7,8 @@ namespace Kria.Core.Pleno
     public class Worker(
         ILogger<Worker> logger,
         IServiceScopeFactory scopeFactory,
-        GlobalErrorHandler errorHandlingMiddleware
+        GlobalErrorHandler errorHandlingMiddleware,
+        IConfigurationDao configurationDao
     ) : BackgroundService
     {
         private readonly ILogger<Worker> _logger = logger;
@@ -15,31 +17,20 @@ namespace Kria.Core.Pleno
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            using var scope = _scopeFactory.CreateScope();
+            var pedagioBLL = scope.ServiceProvider.GetRequiredService<IPedagioBLL>();
+
             while (!stoppingToken.IsCancellationRequested)
             {
                 await _errorHandlingMiddleware.HandleAsync(async () =>
                 {
                     if (_logger.IsEnabled(LogLevel.Information))
-                    {
-                        _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
-                    }
-                    await Task.Delay(2000, stoppingToken);
-                    DadosTeste();
+                        _logger.LogInformation("Serviço Rodando: {time}", DateTimeOffset.Now);
+
+                    var nextRun = int.TryParse(configurationDao.PegarChave("Configuracoes:Execucao"), out var execucao) ? execucao : 2;
+                    await Task.Delay(TimeSpan.FromSeconds(nextRun), stoppingToken);
+                    pedagioBLL.ProcessarLotePedagio();
                 });
-            }
-        }
-       
-        private void DadosTeste()
-        {
-
-            using var scope = _scopeFactory.CreateScope();
-            var pedagioBLL = scope.ServiceProvider.GetRequiredService<IPedagioBLL>();
-
-            Console.WriteLine("Listando Pedágios:");
-            var pedagios = pedagioBLL.ObterTodos().ToList();
-            foreach (var pedagio in pedagios)
-            {
-                Console.WriteLine($"- {pedagio.IdTransacao}");
             }
         }
     }

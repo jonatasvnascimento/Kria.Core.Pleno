@@ -13,9 +13,15 @@ namespace Kria.Core.Pleno.Lib.BLL
     {
         private readonly IPedagioDAO _pedagioDAO = pedagioDAO;
 
-        public IQueryable<TabTransacoes> ObterTodos()
+        public void ProcessarLotePedagio()
         {
-            return _pedagioDAO.ObterTodos();
+            var transacoes = _pedagioDAO.ObterTodos().ToList();
+
+            foreach (var pacote in transacoes.Chunk(1000))
+            {
+
+            }
+
         }
     }
 }
