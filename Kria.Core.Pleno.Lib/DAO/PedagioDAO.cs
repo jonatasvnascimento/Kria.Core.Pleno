@@ -16,7 +16,6 @@ namespace Kria.Core.Pleno.Lib.DAO
 
         public IQueryable<TabTransacoes> ObterTodos()
         {
-            throw new Exception("Teste");
             return _context.AsQueryable();
         }
     }

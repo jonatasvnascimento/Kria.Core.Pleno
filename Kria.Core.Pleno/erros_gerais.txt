@@ -1,0 +1,12 @@
+============================================
+Data: 07/11/2025 18:31:34
+Mensagem: Teste
+Tipo: System.Exception
+StackTrace:
+   at Kria.Core.Pleno.Lib.DAO.PedagioDAO.ObterTodos() in D:\Repositorios\Kria.Core.Pleno\Kria.Core.Pleno.Lib\DAO\PedagioDAO.cs:line 19
+   at Kria.Core.Pleno.Lib.BLL.PedagioBLL.ObterTodos() in D:\Repositorios\Kria.Core.Pleno\Kria.Core.Pleno.Lib\BLL\PedagioBLL.cs:line 18
+   at Kria.Core.Pleno.Worker.DadosTeste() in D:\Repositorios\Kria.Core.Pleno\Kria.Core.Pleno\Worker.cs:line 39
+   at Kria.Core.Pleno.Worker.<>c__DisplayClass4_0.<<ExecuteAsync>b__0>d.MoveNext() in D:\Repositorios\Kria.Core.Pleno\Kria.Core.Pleno\Worker.cs:line 27
+--- End of stack trace from previous location ---
+   at Kria.Core.Pleno.Middleware.GlobalErrorHandler.HandleAsync(Func`1 next) in D:\Repositorios\Kria.Core.Pleno\Kria.Core.Pleno\Middleware\GlobalErrorHandler.cs:line 18
+============================================
