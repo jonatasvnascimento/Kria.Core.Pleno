@@ -5,6 +5,10 @@ VisualStudioVersion = 17.12.35527.113 d17.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kria.Core.Pleno", "Kria.Core.Pleno\Kria.Core.Pleno.csproj", "{EE318444-E736-44A7-8BD4-79AC7BB25A91}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kria.Core.Pleno.Lib", "Kria.Core.Pleno.Lib\Kria.Core.Pleno.Lib.csproj", "{69102C8C-A83F-4868-97E6-13D1B6F605CF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kria.Core.Pleno.Test", "Kria.Core.Pleno.Test\Kria.Core.Pleno.Test.csproj", "{851A16E1-E3F4-4F29-9240-DC5D979CC702}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{EE318444-E736-44A7-8BD4-79AC7BB25A91}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EE318444-E736-44A7-8BD4-79AC7BB25A91}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EE318444-E736-44A7-8BD4-79AC7BB25A91}.Release|Any CPU.Build.0 = Release|Any CPU
+		{69102C8C-A83F-4868-97E6-13D1B6F605CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{69102C8C-A83F-4868-97E6-13D1B6F605CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{69102C8C-A83F-4868-97E6-13D1B6F605CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{69102C8C-A83F-4868-97E6-13D1B6F605CF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{851A16E1-E3F4-4F29-9240-DC5D979CC702}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{851A16E1-E3F4-4F29-9240-DC5D979CC702}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{851A16E1-E3F4-4F29-9240-DC5D979CC702}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{851A16E1-E3F4-4F29-9240-DC5D979CC702}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
