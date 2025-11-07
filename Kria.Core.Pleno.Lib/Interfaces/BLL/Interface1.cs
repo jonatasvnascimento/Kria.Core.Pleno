@@ -4,10 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Kria.Core.Pleno.Lib.Interfaces.DAO
+namespace Kria.Core.Pleno.Lib.Interfaces.BLL
 {
-    public interface IConfigurationDao
+    internal interface Interface1
     {
-        public string? PegarChave(string key);
     }
 }

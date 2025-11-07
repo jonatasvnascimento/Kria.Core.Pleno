@@ -11,7 +11,5 @@ namespace Kria.Core.Pleno.Lib.Ultils
     public class Configuration(IConfiguration configuration) : IConfigurationDao
     {
         public string? PegarChave(string chave) => configuration.GetSection(chave).Value;
-        public string? PegarConnectionString() => configuration.GetConnectionString("DefaultConnection");
-        public string? PegarDataBase() => configuration.GetConnectionString("Candidato");
     }
 }
