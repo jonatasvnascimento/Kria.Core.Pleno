@@ -1,5 +1,4 @@
-﻿using Kria.Core.Pleno.Lib.Entidades;
-using Kria.Core.Pleno.Lib.Interfaces.DAO;
+﻿using Kria.Core.Pleno.Lib.Interfaces.DAO;
 using Kria.Core.Pleno.Lib.Ultils;
 using Microsoft.Extensions.Configuration;
 using MongoDB.Bson;
