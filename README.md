@@ -1,0 +1,1 @@
+# Kria.Core.Pleno
