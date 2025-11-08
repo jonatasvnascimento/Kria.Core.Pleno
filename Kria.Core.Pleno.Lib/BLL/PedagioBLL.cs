@@ -28,7 +28,7 @@ namespace Kria.Core.Pleno.Lib.BLL
             int pacotesProcessamento = TryGetInt("Configuracoes:PacotesProcessamento", 1000);
             int dadosEmMemoria = TryGetInt("Configuracoes:DadosEmMemoria", 10000);
             int threads = TryGetInt("Configuracoes:Threads", Math.Max(1, Environment.ProcessorCount / 2));
-            string candidato = _configurationDao.PegarChave("Candidado") ?? string.Empty; // mantém a chave original
+            string candidato = _configurationDao.PegarChave("Candidado") ?? string.Empty;
 
             DateTime? ultimaData = null;
 
@@ -42,6 +42,7 @@ namespace Kria.Core.Pleno.Lib.BLL
                 var loteGrande = _pedagioDAO.ObterLote(ultimaData, dadosEmMemoria).ToList();
                 if (loteGrande.Count == 0) break;
 
+                totalLoteGrande = loteGrande.Count();
                 foreach (var subLote in loteGrande.Chunk(pacotesProcessamento))
                 {
                     var primeiro = subLote[0];
@@ -59,7 +60,6 @@ namespace Kria.Core.Pleno.Lib.BLL
                     };
 
                     totalSubLote++;
-                    totalLoteGrande += subLote.Length;
 
                     var errosDoLote = await ProcessarSubLoteAsync(
                         _registroPedagioValidator,
