@@ -9,6 +9,6 @@ namespace Kria.Core.Pleno.Lib.Interfaces.BLL
 {
     public interface IPedagioBLL
     {
-        public void ProcessarLotePedagio();
+        public Task ProcessarLotePedagioAsync(CancellationToken cancellationToken = default);
     }
 }

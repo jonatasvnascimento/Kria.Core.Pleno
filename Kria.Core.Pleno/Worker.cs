@@ -29,7 +29,7 @@ namespace Kria.Core.Pleno
 
                     var nextRun = int.TryParse(configurationDao.PegarChave("Configuracoes:Execucao"), out var execucao) ? execucao : 2;
                     await Task.Delay(TimeSpan.FromSeconds(nextRun), stoppingToken);
-                    pedagioBLL.ProcessarLotePedagio();
+                    _ = pedagioBLL.ProcessarLotePedagioAsync();
                 });
             }
         }
