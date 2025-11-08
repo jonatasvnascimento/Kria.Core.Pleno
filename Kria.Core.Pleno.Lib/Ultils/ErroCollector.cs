@@ -10,7 +10,6 @@ namespace Kria.Core.Pleno.Lib.Ultils
     public class ErroCollector
     {
         private readonly ConcurrentBag<string> _erros = new();
-
         public int Count => _erros.Count;
 
         public void Add(string mensagem) => _erros.Add(mensagem);

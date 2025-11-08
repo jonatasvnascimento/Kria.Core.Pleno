@@ -8,6 +8,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Kria.Core.Pleno.Lib.BLL
 {
@@ -15,13 +16,15 @@ namespace Kria.Core.Pleno.Lib.BLL
         IPedagioDAO pedagioDAO,
         IConfigurationDao configurationDao,
         PedagioValidator pedagioValidator,
-        RegistroPedagioValidator registroPedagioValidator
+        RegistroPedagioValidator registroPedagioValidator,
+        ErroCollector erroCollector
     ) : IPedagioBLL
     {
         private readonly IPedagioDAO _pedagioDAO = pedagioDAO;
         private readonly IConfigurationDao _configurationDao = configurationDao;
         private readonly PedagioValidator _pedagioValidator = pedagioValidator;
         private readonly RegistroPedagioValidator _registroPedagioValidator = registroPedagioValidator;
+        private readonly ErroCollector _erroCollector = erroCollector;
 
         public async Task ProcessarLotePedagioAsync()
         {
@@ -89,6 +92,7 @@ namespace Kria.Core.Pleno.Lib.BLL
                     );
 
                     ultimaData = ultimo.DtCriacao;
+                    await erroCollector.SalvarEmDiscoAsync("ErrosPedagio.txt");
                 }
             }
 
@@ -99,7 +103,7 @@ namespace Kria.Core.Pleno.Lib.BLL
             );
         }
 
-        private static async Task<int> ProcessarSubLoteAsync(
+        private async Task<int> ProcessarSubLoteAsync(
             RegistroPedagioValidator registroPedagioValidator,
             int threads,
             int numeroArquivo,
@@ -134,7 +138,7 @@ namespace Kria.Core.Pleno.Lib.BLL
                     if (!result.IsValid)
                     {
                         Interlocked.Increment(ref erros);
-                        var errosStr = string.Join(", ", result.Errors.Select(e => $"Arquivo: {numeroArquivo} {e.PropertyName}: {e.ErrorMessage}: Valor:{e.AttemptedValue}"));
+                        _erroCollector.Add(result.Errors.Select(e => $"Arquivo {pedagio.NumeroArquivo} | Campo: {e.PropertyName} | Erro: {e.ErrorMessage} | ValorError: {e.AttemptedValue}"));
                         return;
                     }
 

@@ -20,6 +20,7 @@ namespace Kria.Core.Pleno
             services.AddScoped<IMongoDbContext, MongoDbContext>();
             services.AddScoped<PedagioValidator>();
             services.AddScoped<RegistroPedagioValidator>();
+            services.AddScoped<ErroCollector>();
         }
     }
 }
