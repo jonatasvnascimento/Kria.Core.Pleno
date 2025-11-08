@@ -11,6 +11,7 @@ namespace Kria.Core.Pleno.Lib.Ultils
     {
         private readonly ConcurrentBag<string> _erros = new();
         public int Count => _erros.Count;
+        public string PastaLog => "Logs";
 
         public void Add(string mensagem) => _erros.Add(mensagem);
         public void Add(IEnumerable<string> mensagens)
@@ -22,7 +23,15 @@ namespace Kria.Core.Pleno.Lib.Ultils
         {
             if (!_erros.Any()) return;
             var linhas = _erros.Select(e => $"[{DateTime.Now:dd/MM/yyyy HH:mm:ss}] {e}");
-            await File.AppendAllLinesAsync(caminho, linhas);
+            await File.AppendAllLinesAsync($"{PastaLog}/{caminho}", linhas);
+        }
+
+        public void CriarDiretorioLog()
+        {
+            if (!Directory.Exists(PastaLog))
+            {
+                Directory.CreateDirectory(PastaLog);
+            }
         }
     }
 }

@@ -7,6 +7,8 @@ using Kria.Core.Pleno.Lib.Validators;
 using System;
 using System.Collections.Concurrent;
 using System.Linq;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -32,6 +34,7 @@ namespace Kria.Core.Pleno.Lib.BLL
             int dadosEmMemoria = TryGetInt("Configuracoes:DadosEmMemoria", 10000);
             int threads = TryGetInt("Configuracoes:Threads", Math.Max(1, Environment.ProcessorCount / 2));
             string candidato = _configurationDao.PegarChave("Candidado") ?? string.Empty;
+            _erroCollector.CriarDiretorioLog();
 
             DateTime? ultimaData = null;
 
@@ -138,7 +141,7 @@ namespace Kria.Core.Pleno.Lib.BLL
                     if (!result.IsValid)
                     {
                         Interlocked.Increment(ref erros);
-                        _erroCollector.Add(result.Errors.Select(e => $"Arquivo {pedagio.NumeroArquivo} | Campo: {e.PropertyName} | Erro: {e.ErrorMessage} | ValorError: {e.AttemptedValue}"));
+                        _erroCollector.Add(result.Errors.Select(e => $"Arquivo {pedagio.NumeroArquivo} | Campo: {e.PropertyName} | Erro: {e.ErrorMessage} | Valor: {e.AttemptedValue} | Obj: {JsonSerializer.Serialize(registro)}"));
                         return;
                     }
 
