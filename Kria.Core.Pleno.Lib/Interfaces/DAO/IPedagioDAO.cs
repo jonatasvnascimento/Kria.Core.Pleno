@@ -10,5 +10,6 @@ namespace Kria.Core.Pleno.Lib.Interfaces.DAO
     public interface IPedagioDAO
     {
         public IQueryable<TabTransacoes> ObterTodos();
+        public IEnumerable<TabTransacoes> ObterLote(DateTime? ultimaData, int tamanho);
     }
 }

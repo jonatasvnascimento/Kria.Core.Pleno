@@ -18,5 +18,20 @@ namespace Kria.Core.Pleno.Lib.DAO
         {
             return _context.AsQueryable();
         }
+
+        public IEnumerable<TabTransacoes> ObterLote(DateTime? ultimaData, int tamanho)
+        {
+            var filtro = Builders<TabTransacoes>.Filter.Empty;
+
+            if (ultimaData.HasValue)
+                filtro = Builders<TabTransacoes>.Filter.Gt(t => t.DtCriacao, ultimaData.Value);
+
+            return _context
+                .Find(filtro)
+                .SortBy(t => t.DtCriacao)
+                .Limit(tamanho)
+                .ToList();
+        }
+
     }
 }

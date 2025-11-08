@@ -13,11 +13,11 @@ namespace Kria.Core.Pleno.Lib.Validators
         public PedagioValidator()
         {
             RuleFor(p => p.Candidato)
-                .NotNull().NotEmpty().WithMessage("O campo Candidato é obrigatório.");
+                .NotNull().NotEmpty().WithMessage("O campo é obrigatório.");
             RuleFor(p => p.DataReferencia)
-                .NotNull().NotEmpty().WithMessage("O campo DataReferencia é obrigatório.");
+                .NotNull().NotEmpty().WithMessage("O campo é obrigatório.");
             RuleFor(p => p.NumeroArquivo)
-                .NotNull().NotEmpty().WithMessage("O campo NumeroArquivo é obrigatório.");
+                .NotNull().NotEmpty().WithMessage("O campo é obrigatório.");
         }
     }
 }

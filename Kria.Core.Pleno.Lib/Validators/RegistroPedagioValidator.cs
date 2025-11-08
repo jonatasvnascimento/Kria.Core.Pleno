@@ -13,27 +13,27 @@ namespace Kria.Core.Pleno.Lib.Validators
         public RegistroPedagioValidator()
         {
             RuleFor(p => p.GUID)
-                .NotNull().NotEmpty().WithMessage("O campo GUID é obrigatório.");
+                .NotNull().NotEmpty().WithMessage("O campo é obrigatório.");
             RuleFor(p => p.CodigoPracaPedagio)
-                .NotNull().NotEmpty().WithMessage("O campo CodigoPracaPedagio é obrigatório.");
+                .NotNull().NotEmpty().WithMessage("O campo é obrigatório.");
             RuleFor(p => p.CodigoCabine)
-                .NotNull().NotEmpty().WithMessage("O campo CodigoCabine é obrigatório.");
+                .NotNull().NotEmpty().WithMessage("O campo é obrigatório.");
             RuleFor(p => p.Instante)
-                .NotNull().NotEmpty().WithMessage("O campo Instante é obrigatório.");
+                .NotNull().NotEmpty().WithMessage("O campo é obrigatório.");
             RuleFor(p => p.Sentido)
-                .NotNull().NotEmpty().WithMessage("O campo Sentido é obrigatório.");
+                .NotNull().NotEmpty().WithMessage("O campo é obrigatório.");
             RuleFor(p => p.TipoVeiculo)
-                .NotNull().NotEmpty().WithMessage("O campo TipoVeiculo é obrigatório.");
+                .NotNull().NotEmpty().WithMessage("O campo é obrigatório.");
             RuleFor(p => p.Isento)
-                .NotNull().NotEmpty().WithMessage("O campo Isento é obrigatório.");
+                .NotNull().NotEmpty().WithMessage("O campo é obrigatório.");
             RuleFor(p => p.Evasao)
-                .NotNull().NotEmpty().WithMessage("O campo Evasao é obrigatório.");
+                .NotNull().NotEmpty().WithMessage("O campo é obrigatório.");
             RuleFor(p => p.TipoCobrancaEfetuada)
-                .NotNull().NotEmpty().WithMessage("O campo TipoCobrancaEfetuada é obrigatório.");
+                .NotNull().NotEmpty().WithMessage("O campo é obrigatório.");
             RuleFor(p => p.ValorDevido)
-                .NotNull().NotEmpty().WithMessage("O campo ValorDevido é obrigatório.");
+                .NotNull().NotEmpty().WithMessage("O campo é obrigatório.");
             RuleFor(p => p.ValorArrecadado)
-                .NotNull().NotEmpty().WithMessage("O campo ValorArrecadado é obrigatório.");
+                .NotNull().NotEmpty().WithMessage("O campo é obrigatório.");
         }
     }
 }

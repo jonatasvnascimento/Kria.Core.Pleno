@@ -16,8 +16,8 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 namespace Kria.Core.Pleno.Lib.BLL
 {
     public class PedagioBLL(
-        IPedagioDAO pedagioDAO, 
-        IConfigurationDao configurationDao, 
+        IPedagioDAO pedagioDAO,
+        IConfigurationDao configurationDao,
         ILogger<PedagioBLL> logger,
         PedagioValidator pedagioValidator,
         RegistroPedagioValidator registroPedagioValidator
@@ -29,38 +29,35 @@ namespace Kria.Core.Pleno.Lib.BLL
 
         public async void ProcessarLotePedagio()
         {
-            var transacoes = _pedagioDAO.ObterTodos().ToList();
             int tamanhoPacote = int.TryParse(_configurationDao.PegarChave("Configuracoes:Pacotes"), out var pacotes) ? pacotes : 1000;
-            string Candidado = _configurationDao.PegarChave("Candidado") ?? string.Empty;
-            int numeroPacote = 0;
+            int threads = int.TryParse(_configurationDao.PegarChave("Configuracoes:Threads"), out var t) ? t : Environment.ProcessorCount / 2;
+            string candidato = _configurationDao.PegarChave("Candidado") ?? string.Empty;
 
-            foreach (var pacote in transacoes.Chunk(tamanhoPacote))
+            DateTime? ultimaData = null;
+            int numeroArquivo = 0;
+            var totalLote = 0;
+
+
+            while (true)
             {
-                numeroPacote++;
-                _logger.LogInformation("Processando Pacote: {numeroPacote}", numeroPacote);
+                var lote = _pedagioDAO.ObterLote(ultimaData, tamanhoPacote).ToList();
+                if (!lote.Any()) break;
 
-                await Parallel.ForEachAsync(pacote, new ParallelOptions { MaxDegreeOfParallelism = 1 }, async (item, _) =>
+                var dataReferencia = lote.First().DtCriacao.ToString("dd/MM/yyyy");
+                numeroArquivo = GerarId.ObterProximoNumeroArquivo(dataReferencia);
+
+                Pedagio pedagio = new()
                 {
-                    Pedagio pedagio = new()
-                    {
-                        Candidato = Candidado,
-                        DataReferencia = item.DtCriacao.ToString("dd/mm/yyyy"),
-                        NumeroArquivo = GerarId.ObterProximoNumeroArquivo(item.DtCriacao.ToString("dd/mm/yyyy")),
-                    };
+                    Candidato = candidato,
+                    DataReferencia = dataReferencia,
+                    NumeroArquivo = numeroArquivo,
+                    Registros = new()
+                };
+                totalLote++;
 
-                    var result = pedagioValidator.ValidateAsync(pedagio);
-
-                    if (!result.Result.IsValid)
-                    {
-                        var errosDetalhados = result.Result.Errors?
-                             .Select(e => $"{e.PropertyName}: {e.ErrorMessage}")
-                             .ToList() ?? new List<string> { result.Result.ToString() };
-                        var mensagem = string.Join(", ", errosDetalhados);
-                        _logger.LogError("Erros de validação no Pedagio: {Erros}", mensagem);
-                        return;
-                    }
-
-                    RegistroPedagio registroPedagio = new()
+                await Parallel.ForEachAsync(lote, new ParallelOptions { MaxDegreeOfParallelism = threads }, async (item, _) =>
+                {
+                    var registro = new RegistroPedagio
                     {
                         GUID = Guid.NewGuid().ToString(),
                         CodigoPracaPedagio = int.TryParse(item.CodigoPracaPedagio, out var codigo) ? codigo : 0,
@@ -76,25 +73,42 @@ namespace Kria.Core.Pleno.Lib.BLL
                         MultiplicadorTarifa = 0
                     };
 
-                    var resultRegistro = registroPedagioValidator.ValidateAsync(registroPedagio);
-
-                    if (!resultRegistro.Result.IsValid)
+                    var result = await registroPedagioValidator.ValidateAsync(registro);
+                    if (!result.IsValid)
                     {
-                        var errosDetalhados = resultRegistro.Result.Errors?
-                             .Select(e => $"{e.PropertyName}: {e.ErrorMessage}")
-                             .ToList() ?? new List<string> { resultRegistro.Result.ToString() };
-                        var mensagem = string.Join(", ", errosDetalhados);
-                        _logger.LogError("Erros de validação no RegistroPedagio: {Erros}", mensagem);
+                        var erros = string.Join(", ", result.Errors.Select(e => $"Arquivo: {numeroArquivo} {e.PropertyName}: {e.ErrorMessage}: Valor:{e.AttemptedValue}"));
+                        //_logger.LogError("Erro de validação no registro: {Erros}", erros);
                         return;
                     }
 
-                    pedagio.Registros.Add(registroPedagio);
+                    lock (pedagio.Registros)
+                    {
+                        pedagio.Registros.Add(registro);
+                    }
 
+                    _logger.LogDebug("Registro processado: {GUID}", registro.GUID);
                 });
 
-                
+                var resultPedagio = await pedagioValidator.ValidateAsync(pedagio);
+                if (!resultPedagio.IsValid)
+                {
+                    var erros = string.Join(", ", resultPedagio.Errors.Select(e => $"{e.PropertyName}: {e.ErrorMessage}"));
+                    //_logger.LogError("Erros de validação no Pedagio: {Erros}", erros);
+                    ultimaData = lote.Last().DtCriacao;
+                    continue;
+                }
+
+                // await _pedagioDAO.SalvarPedagioAsync(pedagio);
+
+                _logger.LogInformation("Lote {NumeroArquivo} processado com {Qtd} registros (Data {Data})",
+                    numeroArquivo, pedagio.Registros.Count, dataReferencia);
+
+                ultimaData = lote.Last().DtCriacao;
             }
 
+            _logger.LogInformation("Processamento concluído com {NumLotes} lotes.", totalLote);
+
         }
+
     }
 }
