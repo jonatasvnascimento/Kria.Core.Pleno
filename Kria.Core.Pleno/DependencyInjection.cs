@@ -4,6 +4,7 @@ using Kria.Core.Pleno.Lib.DAO;
 using Kria.Core.Pleno.Lib.Interfaces.BLL;
 using Kria.Core.Pleno.Lib.Interfaces.DAO;
 using Kria.Core.Pleno.Lib.Ultils;
+using Kria.Core.Pleno.Lib.Validators;
 using Kria.Core.Pleno.Middleware;
 
 namespace Kria.Core.Pleno
@@ -17,6 +18,8 @@ namespace Kria.Core.Pleno
             services.AddScoped<IPedagioDAO, PedagioDAO>();
             services.AddScoped<IPedagioBLL, PedagioBLL>();
             services.AddScoped<IMongoDbContext, MongoDbContext>();
+            services.AddScoped<PedagioValidator>();
+            services.AddScoped<RegistroPedagioValidator>();
         }
     }
 }
