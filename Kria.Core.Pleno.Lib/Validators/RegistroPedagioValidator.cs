@@ -35,7 +35,10 @@ namespace Kria.Core.Pleno.Lib.Validators
             RuleFor(p => p.ValorArrecadado)
                 .NotNull().NotEmpty().WithMessage("O campo é obrigatório.");
             RuleFor(p => p.MultiplicadorTarifa)
-                .NotNull().NotEmpty().WithMessage("O campo é obrigatório.");
+                .NotNull()
+                .NotEmpty()
+                .Must(x => string.IsNullOrEmpty(x) || (double.TryParse(x, out var v) && v != double.MinValue))
+                .WithMessage("O campo é obrigatório.");
 
         }
     }

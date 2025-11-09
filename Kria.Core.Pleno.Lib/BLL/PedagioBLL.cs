@@ -8,6 +8,7 @@ using Kria.Core.Pleno.Lib.Validators;
 using Microsoft.Win32;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -143,6 +144,8 @@ namespace Kria.Core.Pleno.Lib.BLL
                 new ParallelOptions { MaxDegreeOfParallelism = Math.Max(1, threads) },
                 async (item, _) =>
                 {
+                    int tipoVeiculo = Random.Shared.Next(1, 3);
+
                     var registro = new RegistroPedagio
                     {
                         GUID = Guid.NewGuid().ToString(),
@@ -150,13 +153,13 @@ namespace Kria.Core.Pleno.Lib.BLL
                         CodigoCabine = item.CodigoCabine.ToString(),
                         Instante = item.Instante,
                         Sentido = item.Sentido.ToString(),
-                        TipoVeiculo = ((int)ETipoVeiculo.Comercial).ToString(),
+                        TipoVeiculo = tipoVeiculo.ToString(),
                         Isento = item.Isento.ToString(),
                         Evasao = item.Evasao.ToString(),
                         TipoCobrancaEfetuada = item.TipoCobranca.ToString(),
                         ValorDevido = item.ValorDevido.ToString(),
                         ValorArrecadado = item.ValorArrecadado.ToString(),
-                        MultiplicadorTarifa = "0"
+                        MultiplicadorTarifa = PedagioMultiplicadorTarifa.Calcular(tipoVeiculo, item.Isento).ToString()
                     };
 
                     var result = await registroPedagioValidator.ValidateAsync(registro).ConfigureAwait(false);
