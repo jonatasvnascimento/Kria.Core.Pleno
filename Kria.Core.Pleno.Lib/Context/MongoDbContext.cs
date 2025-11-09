@@ -14,7 +14,7 @@ namespace Kria.Core.Pleno.Lib.Context
     public class MongoDbContext : IMongoDbContext
     {
         private readonly IMongoDatabase _database;
-        public MongoDbContext(IConfigurationDao configuration)
+        public MongoDbContext(IConfigurationDAO configuration)
         {
             var connectionString = configuration.PegarChave("ConnectionStrings:DefaultConnection");
             var databaseName = configuration.PegarChave("ConnectionStrings:Database");

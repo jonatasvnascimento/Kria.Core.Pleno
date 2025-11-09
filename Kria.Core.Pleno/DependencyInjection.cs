@@ -13,14 +13,15 @@ namespace Kria.Core.Pleno
     {
         public static void Injection(this IServiceCollection services)
         {
-            services.AddSingleton<IConfigurationDao, Configuration>();
-            services.AddSingleton<GlobalErrorHandler>();
+            services.AddSingleton<IConfigurationDAO, Configuration>();
             services.AddScoped<IPedagioDAO, PedagioDAO>();
             services.AddScoped<IPedagioBLL, PedagioBLL>();
             services.AddScoped<IMongoDbContext, MongoDbContext>();
+            services.AddScoped<IErroCollectorDAO, ErroCollector>();
+
+            services.AddSingleton<GlobalErrorHandler>();
             services.AddScoped<PedagioValidator>();
             services.AddScoped<RegistroPedagioValidator>();
-            services.AddScoped<ErroCollector>();
         }
     }
 }

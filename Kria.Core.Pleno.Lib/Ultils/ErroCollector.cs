@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Kria.Core.Pleno.Lib.Interfaces.DAO;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,9 +8,11 @@ using System.Threading.Tasks;
 
 namespace Kria.Core.Pleno.Lib.Ultils
 {
-    public class ErroCollector
+    public class ErroCollector(IConfigurationDAO configurationDao) : IErroCollectorDAO
     {
         private readonly ConcurrentBag<string> _erros = new();
+        private IConfigurationDAO _configurationDao = configurationDao;
+
         public int Count => _erros.Count;
         public string PastaLog => "Logs";
 

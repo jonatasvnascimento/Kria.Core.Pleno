@@ -1,4 +1,5 @@
-﻿using Kria.Core.Pleno.Lib.Entidades;
+﻿using FluentValidation.Results;
+using Kria.Core.Pleno.Lib.Entidades;
 using Kria.Core.Pleno.Lib.Entidades.Enum;
 using Kria.Core.Pleno.Lib.Interfaces.BLL;
 using Kria.Core.Pleno.Lib.Interfaces.DAO;
@@ -14,27 +15,41 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Kria.Core.Pleno.Lib.BLL
 {
-    public class PedagioBLL(
-        IPedagioDAO pedagioDAO,
-        IConfigurationDao configurationDao,
-        PedagioValidator pedagioValidator,
-        RegistroPedagioValidator registroPedagioValidator,
-        ErroCollector erroCollector
-    ) : IPedagioBLL
+    public class PedagioBLL : IPedagioBLL
     {
-        private readonly IPedagioDAO _pedagioDAO = pedagioDAO;
-        private readonly IConfigurationDao _configurationDao = configurationDao;
-        private readonly PedagioValidator _pedagioValidator = pedagioValidator;
-        private readonly RegistroPedagioValidator _registroPedagioValidator = registroPedagioValidator;
-        private readonly ErroCollector _erroCollector = erroCollector;
+        private readonly IPedagioDAO _pedagioDAO;
+        private readonly IConfigurationDAO _configurationDAO;
+        private readonly IErroCollectorDAO _erroCollectorDAO;
+        private readonly PedagioValidator _pedagioValidator;
+        private readonly RegistroPedagioValidator _registroPedagioValidator;
+
+        private int pacotesProcessamento, dadosEmMemoria, threads, logError;
+        private string candidato;
+
+        public PedagioBLL(
+            IPedagioDAO pedagioDAO,
+            IConfigurationDAO configurationDAO,
+            IErroCollectorDAO erroCollectorDAO,
+            PedagioValidator pedagioValidator,
+            RegistroPedagioValidator registroPedagioValidator)
+        {
+            _pedagioDAO = pedagioDAO;
+            _configurationDAO = configurationDAO;
+            _pedagioValidator = pedagioValidator;
+            _registroPedagioValidator = registroPedagioValidator;
+            _erroCollectorDAO = erroCollectorDAO;
+
+            pacotesProcessamento = TryGetInt("Configuracoes:PacotesProcessamento", 1000);
+            dadosEmMemoria = TryGetInt("Configuracoes:DadosEmMemoria", 10000);
+            threads = TryGetInt("Configuracoes:Threads", Math.Max(1, Environment.ProcessorCount / 2));
+            candidato = _configurationDAO.PegarChave("Candidado") ?? string.Empty;
+            logError = TryGetInt("Configuracoes:LogError", (int)ESalvarLog.NAO);
+        }
 
         public async Task ProcessarLotePedagioAsync()
         {
-            int pacotesProcessamento = TryGetInt("Configuracoes:PacotesProcessamento", 1000);
-            int dadosEmMemoria = TryGetInt("Configuracoes:DadosEmMemoria", 10000);
-            int threads = TryGetInt("Configuracoes:Threads", Math.Max(1, Environment.ProcessorCount / 2));
-            string candidato = _configurationDao.PegarChave("Candidado") ?? string.Empty;
-            _erroCollector.CriarDiretorioLog();
+            
+            _erroCollectorDAO.CriarDiretorioLog();
 
             DateTime? ultimaData = null;
 
@@ -95,7 +110,7 @@ namespace Kria.Core.Pleno.Lib.BLL
                     );
 
                     ultimaData = ultimo.DtCriacao;
-                    await erroCollector.SalvarEmDiscoAsync("ErrosPedagio.txt");
+                    await _erroCollectorDAO.SalvarEmDiscoAsync("ErrosPedagio.txt");
                 }
             }
 
@@ -141,7 +156,7 @@ namespace Kria.Core.Pleno.Lib.BLL
                     if (!result.IsValid)
                     {
                         Interlocked.Increment(ref erros);
-                        _erroCollector.Add(result.Errors.Select(e => $"Arquivo {pedagio.NumeroArquivo} | Campo: {e.PropertyName} | Erro: {e.ErrorMessage} | Valor: {e.AttemptedValue} | Obj: {JsonSerializer.Serialize(registro)}"));
+                        SalvarLog(pedagio, registro, result);
                         return;
                     }
 
@@ -155,7 +170,13 @@ namespace Kria.Core.Pleno.Lib.BLL
             return erros;
         }
 
+        private void SalvarLog(Pedagio pedagio, RegistroPedagio registro, ValidationResult result)
+        {
+            if (logError == (int)ESalvarLog.SIM)
+                _erroCollectorDAO.Add(result.Errors.Select(e => $"Arquivo {pedagio.NumeroArquivo} | Campo: {e.PropertyName} | Erro: {e.ErrorMessage} | Valor: {e.AttemptedValue} | Obj: {JsonSerializer.Serialize(registro)}"));
+        }
+
         private int TryGetInt(string key, int @default)
-            => int.TryParse(_configurationDao.PegarChave(key), out var val) ? val : @default;
+            => int.TryParse(_configurationDAO.PegarChave(key), out var val) ? val : @default;
     }
 }

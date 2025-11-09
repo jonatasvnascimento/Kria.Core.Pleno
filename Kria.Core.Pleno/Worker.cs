@@ -8,7 +8,7 @@ namespace Kria.Core.Pleno
         ILogger<Worker> logger,
         IServiceScopeFactory scopeFactory,
         GlobalErrorHandler errorHandlingMiddleware,
-        IConfigurationDao configurationDao
+        IConfigurationDAO configurationDao
     ) : BackgroundService
     {
         private readonly ILogger<Worker> _logger = logger;

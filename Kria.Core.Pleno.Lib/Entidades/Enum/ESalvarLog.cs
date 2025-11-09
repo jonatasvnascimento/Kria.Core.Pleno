@@ -4,10 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Kria.Core.Pleno.Lib.Interfaces.DAO
+namespace Kria.Core.Pleno.Lib.Entidades.Enum
 {
-    public interface IConfigurationDAO
+    public enum ESalvarLog
     {
-        public string? PegarChave(string key);
+        SIM = 1,
+        NAO = 2
     }
+   
 }

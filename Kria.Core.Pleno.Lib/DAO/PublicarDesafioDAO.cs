@@ -15,7 +15,7 @@ namespace Kria.Core.Pleno.Lib.DAO
         private readonly JsonSerializerOptions _jsonOptions;
         private readonly HttpClient _httpClient;
 
-        public PublicarDesafioDAO(IConfigurationDao configuration, HttpClient httpClient)
+        public PublicarDesafioDAO(IConfigurationDAO configuration, HttpClient httpClient)
         {
             _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
             _urlBase = configuration.PegarChave("Api") ?? throw new ArgumentException("Chave 'Api' não encontrada nas configurações.");
