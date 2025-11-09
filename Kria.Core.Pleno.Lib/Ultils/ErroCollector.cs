@@ -14,6 +14,7 @@ namespace Kria.Core.Pleno.Lib.Ultils
         private IConfigurationDAO _configurationDao = configurationDao;
 
         public int Count => _erros.Count;
+        private string pathCaminho {  get; set; } = string.Empty;
         public string PastaLog => "Logs";
 
         public void Add(string mensagem) => _erros.Add(mensagem);
@@ -26,7 +27,8 @@ namespace Kria.Core.Pleno.Lib.Ultils
         {
             if (!_erros.Any()) return;
             var linhas = _erros.Select(e => $"[{DateTime.Now:dd/MM/yyyy HH:mm:ss}] {e}");
-            await File.AppendAllLinesAsync($"{PastaLog}/{caminho}", linhas);
+            pathCaminho = $"{PastaLog}/{caminho}";
+            await File.AppendAllLinesAsync(pathCaminho, linhas);
         }
 
         public void CriarDiretorioLog()
@@ -36,5 +38,7 @@ namespace Kria.Core.Pleno.Lib.Ultils
                 Directory.CreateDirectory(PastaLog);
             }
         }
+
+        public string PathLog() => pathCaminho;
     }
 }

@@ -119,6 +119,9 @@ namespace Kria.Core.Pleno.Lib.BLL
                 "Finalizado: ",
                 ConsoleColor.Green
             );
+
+            if (logError == (int)ESalvarLog.SIM)
+                Terminal.Mensagem($"Log salvo em {_erroCollectorDAO.PathLog()}", "LogError: ", ConsoleColor.Cyan);
         }
 
         private async Task<int> ProcessarSubLoteAsync(

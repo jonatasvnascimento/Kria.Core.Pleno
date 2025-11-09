@@ -11,5 +11,6 @@ namespace Kria.Core.Pleno.Lib.Interfaces.DAO
         public Task SalvarEmDiscoAsync(string caminho);
         public void Add(IEnumerable<string> mensagens);
         public void CriarDiretorioLog();
+        public string PathLog();
     }
 }
