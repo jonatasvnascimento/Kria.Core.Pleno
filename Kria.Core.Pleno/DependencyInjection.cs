@@ -18,10 +18,13 @@ namespace Kria.Core.Pleno
             services.AddScoped<IPedagioBLL, PedagioBLL>();
             services.AddScoped<IMongoDbContext, MongoDbContext>();
             services.AddScoped<IErroCollectorDAO, ErroCollector>();
+            services.AddScoped<IPublicarDesafioDAO, PublicarDesafioDAO>();
+
 
             services.AddSingleton<GlobalErrorHandler>();
             services.AddScoped<PedagioValidator>();
             services.AddScoped<RegistroPedagioValidator>();
+            services.AddScoped<HttpClient>();
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Kria.Core.Pleno.Lib.Entidades;
 using Kria.Core.Pleno.Lib.Interfaces.DAO;
+using Kria.Core.Pleno.Lib.Ultils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,28 +34,13 @@ namespace Kria.Core.Pleno.Lib.DAO
             var json = JsonSerializer.Serialize(registroPedagio, _jsonOptions);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            try
-            {
-                using var response = await _httpClient.PostAsync(url, content);
-                var respostaApi = await response.Content.ReadAsStringAsync();
+            using var response = await _httpClient.PostAsync(url, content);
+            var respostaApi = await response.Content.ReadAsStringAsync();
 
-                if (response.IsSuccessStatusCode)
-                {
-                    Console.WriteLine("Registro de pedágio publicado com sucesso.");
-                }
-                else
-                {
-                    Console.WriteLine($"Erro ao publicar registro de pedágio ({response.StatusCode}): {respostaApi}");
-                }
-            }
-            catch (HttpRequestException ex)
-            {
-                Console.WriteLine($"Erro de conexão com a API: {ex.Message}");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Erro inesperado: {ex.Message}");
-            }
+            if (response.IsSuccessStatusCode)
+                Terminal.Mensagem($"Registro de pedágio publicado com sucesso.", "Enviado API: ", ConsoleColor.Magenta);
+            else
+                Terminal.Mensagem($"Erro ao publicar registro de pedágio ({response.StatusCode}): {respostaApi}", "Enviado API: ", ConsoleColor.Red);
         }
     }
 }

@@ -8,17 +8,17 @@ namespace Kria.Core.Pleno.Lib.Entidades
 {
     public class RegistroPedagio
     {
-        public string GUID { get; set; } = string.Empty;              
-        public int CodigoPracaPedagio { get; set; }      
-        public int CodigoCabine { get; set; }            
+        public string GUID { get; set; } = string.Empty;
+        public string CodigoPracaPedagio { get; set; } = string.Empty;
+        public string CodigoCabine { get; set; } = string.Empty;
         public string Instante { get; set; } = string.Empty;             
-        public int Sentido { get; set; }                 
-        public int TipoVeiculo { get; set; }             
-        public int Isento { get; set; }                  
-        public int Evasao { get; set; }                  
-        public int TipoCobrancaEfetuada { get; set; }    
-        public decimal ValorDevido { get; set; }         
-        public decimal ValorArrecadado { get; set; }     
-        public decimal MultiplicadorTarifa { get; set; } 
+        public string Sentido { get; set; } = string.Empty;
+        public string TipoVeiculo { get; set; } = string.Empty;
+        public string Isento { get; set; } = string.Empty;
+        public string Evasao { get; set; } = string.Empty;
+        public string TipoCobrancaEfetuada { get; set; } = string.Empty;
+        public string ValorDevido { get; set; } = string.Empty;
+        public string ValorArrecadado { get; set; } = string.Empty;
+        public string MultiplicadorTarifa { get; set; } = string.Empty;
     }
 }

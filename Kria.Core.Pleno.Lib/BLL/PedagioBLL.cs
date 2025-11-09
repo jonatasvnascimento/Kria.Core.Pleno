@@ -5,6 +5,7 @@ using Kria.Core.Pleno.Lib.Interfaces.BLL;
 using Kria.Core.Pleno.Lib.Interfaces.DAO;
 using Kria.Core.Pleno.Lib.Ultils;
 using Kria.Core.Pleno.Lib.Validators;
+using Microsoft.Win32;
 using System;
 using System.Collections.Concurrent;
 using System.Linq;
@@ -20,6 +21,7 @@ namespace Kria.Core.Pleno.Lib.BLL
         private readonly IPedagioDAO _pedagioDAO;
         private readonly IConfigurationDAO _configurationDAO;
         private readonly IErroCollectorDAO _erroCollectorDAO;
+        private readonly IPublicarDesafioDAO _publicarDesafioDAO;
         private readonly PedagioValidator _pedagioValidator;
         private readonly RegistroPedagioValidator _registroPedagioValidator;
 
@@ -30,6 +32,7 @@ namespace Kria.Core.Pleno.Lib.BLL
             IPedagioDAO pedagioDAO,
             IConfigurationDAO configurationDAO,
             IErroCollectorDAO erroCollectorDAO,
+            IPublicarDesafioDAO publicarDesafioDAO,
             PedagioValidator pedagioValidator,
             RegistroPedagioValidator registroPedagioValidator)
         {
@@ -38,6 +41,7 @@ namespace Kria.Core.Pleno.Lib.BLL
             _pedagioValidator = pedagioValidator;
             _registroPedagioValidator = registroPedagioValidator;
             _erroCollectorDAO = erroCollectorDAO;
+            _publicarDesafioDAO = publicarDesafioDAO;
 
             pacotesProcessamento = TryGetInt("Configuracoes:PacotesProcessamento", 1000);
             dadosEmMemoria = TryGetInt("Configuracoes:DadosEmMemoria", 10000);
@@ -68,6 +72,7 @@ namespace Kria.Core.Pleno.Lib.BLL
                 {
                     var primeiro = subLote[0];
                     var ultimo = subLote[^1];
+                    totalSubLote++;
 
                     var dataReferencia = primeiro.DtCriacao.ToString("dd/MM/yyyy");
                     var numeroArquivo = GerarId.ObterProximoNumeroArquivo(dataReferencia);
@@ -80,7 +85,14 @@ namespace Kria.Core.Pleno.Lib.BLL
                         Registros = new()
                     };
 
-                    totalSubLote++;
+                    var resultPedagio = await _pedagioValidator.ValidateAsync(pedagio).ConfigureAwait(false);
+                    if (!resultPedagio.IsValid)
+                    {
+                        if (logError == (int)ESalvarLog.SIM)
+                            _erroCollectorDAO.Add(resultPedagio.Errors.Select(e => $"Arquivo {pedagio.NumeroArquivo} | Campo: {e.PropertyName} | Erro: {e.ErrorMessage} | Valor: {e.AttemptedValue} | Obj: {JsonSerializer.Serialize(pedagio)}"));
+                        ultimaData = ultimo.DtCriacao;
+                        continue;
+                    }
 
                     var errosDoLote = await ProcessarSubLoteAsync(
                         _registroPedagioValidator,
@@ -91,16 +103,8 @@ namespace Kria.Core.Pleno.Lib.BLL
                     ).ConfigureAwait(false);
 
                     totalErro += errosDoLote;
-
-                    var resultPedagio = await _pedagioValidator.ValidateAsync(pedagio).ConfigureAwait(false);
-                    if (!resultPedagio.IsValid)
-                    {
-                        var erros = string.Join(", ", resultPedagio.Errors.Select(e => $"{e.PropertyName}: {e.ErrorMessage}"));
-                        ultimaData = ultimo.DtCriacao;
-                        continue;
-                    }
-
-                    // await _pedagioDAO.SalvarPedagioAsync(pedagio).ConfigureAwait(false);
+                    
+                    await _publicarDesafioDAO.PublicarRegistroPedagio(pedagio);
 
                     totalItemSubLote += pedagio.Registros.Count;
                     Terminal.Mensagem(
@@ -142,24 +146,25 @@ namespace Kria.Core.Pleno.Lib.BLL
                     var registro = new RegistroPedagio
                     {
                         GUID = Guid.NewGuid().ToString(),
-                        CodigoPracaPedagio = int.TryParse(item.CodigoPracaPedagio, out var codigo) ? codigo : 0,
-                        CodigoCabine = item.CodigoCabine,
+                        CodigoPracaPedagio = item.CodigoPracaPedagio,
+                        CodigoCabine = item.CodigoCabine.ToString(),
                         Instante = item.Instante,
-                        Sentido = item.Sentido,
-                        TipoVeiculo = (int)ETipoVeiculo.Comercial,
-                        Isento = item.Isento,
-                        Evasao = item.Evasao,
-                        TipoCobrancaEfetuada = item.TipoCobranca,
-                        ValorDevido = item.ValorDevido,
-                        ValorArrecadado = item.ValorArrecadado,
-                        MultiplicadorTarifa = 0
+                        Sentido = item.Sentido.ToString(),
+                        TipoVeiculo = ((int)ETipoVeiculo.Comercial).ToString(),
+                        Isento = item.Isento.ToString(),
+                        Evasao = item.Evasao.ToString(),
+                        TipoCobrancaEfetuada = item.TipoCobranca.ToString(),
+                        ValorDevido = item.ValorDevido.ToString(),
+                        ValorArrecadado = item.ValorArrecadado.ToString(),
+                        MultiplicadorTarifa = "0"
                     };
 
                     var result = await registroPedagioValidator.ValidateAsync(registro).ConfigureAwait(false);
                     if (!result.IsValid)
                     {
                         Interlocked.Increment(ref erros);
-                        SalvarLog(pedagio, registro, result);
+                        if (logError == (int)ESalvarLog.SIM)
+                            _erroCollectorDAO.Add(result.Errors.Select(e => $"Arquivo {pedagio.NumeroArquivo} | Campo: {e.PropertyName} | Erro: {e.ErrorMessage} | Valor: {e.AttemptedValue} | Obj: {JsonSerializer.Serialize(registro)}"));
                         return;
                     }
 
@@ -171,12 +176,6 @@ namespace Kria.Core.Pleno.Lib.BLL
                 pedagio.Registros.AddRange(buffer);
 
             return erros;
-        }
-
-        private void SalvarLog(Pedagio pedagio, RegistroPedagio registro, ValidationResult result)
-        {
-            if (logError == (int)ESalvarLog.SIM)
-                _erroCollectorDAO.Add(result.Errors.Select(e => $"Arquivo {pedagio.NumeroArquivo} | Campo: {e.PropertyName} | Erro: {e.ErrorMessage} | Valor: {e.AttemptedValue} | Obj: {JsonSerializer.Serialize(registro)}"));
         }
 
         private int TryGetInt(string key, int @default)
