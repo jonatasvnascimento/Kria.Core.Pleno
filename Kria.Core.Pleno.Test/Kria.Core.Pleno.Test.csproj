@@ -10,7 +10,6 @@
     <Folder Include="BLL\" />
     <Folder Include="DAO\" />
     <Folder Include="Context\" />
-    <Folder Include="Validators\" />
   </ItemGroup>
 
   <ItemGroup>
