@@ -17,7 +17,12 @@ namespace Kria.Core.Pleno.Lib.Context
         public MongoDbContext(IConfigurationDAO configuration)
         {
             var connectionString = configuration.PegarChave("ConnectionStrings:DefaultConnection");
+            if (string.IsNullOrEmpty(connectionString))
+                throw new MongoConfigurationException("String de conexão do Banco não configurada no appsettings");
+
             var databaseName = configuration.PegarChave("ConnectionStrings:Database");
+            if (string.IsNullOrEmpty(databaseName))
+                throw new MongoConfigurationException("Chave de banco de dados não configurada no appsettings");
 
             var client = new MongoClient(connectionString);
             _database = client.GetDatabase(databaseName);

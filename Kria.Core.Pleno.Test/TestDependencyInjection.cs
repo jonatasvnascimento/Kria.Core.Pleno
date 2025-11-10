@@ -25,8 +25,8 @@ namespace Kria.Core.Pleno.Test
             services.AddSingleton<IConfiguration>(config);
             services.AddSingleton<IConfigurationDAO, Configuration>();
 
-            var mockConfig = new Mock<IConfigurationDAO>();
-            services.AddSingleton(mockConfig.Object);
+            //var mockConfig = new Mock<IConfigurationDAO>();
+            //services.AddSingleton(mockConfig.Object);
 
             services.AddScoped<IPedagioDAO, PedagioDAO>();
             services.AddScoped<IPedagioBLL, PedagioBLL>();

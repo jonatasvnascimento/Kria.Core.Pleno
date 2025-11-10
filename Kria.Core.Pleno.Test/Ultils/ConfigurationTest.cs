@@ -21,11 +21,10 @@ namespace Kria.Core.Pleno.Test.Ultils
             _serviceProvider = TestDependencyInjection.BuildTestServices();
             using var scope = _serviceProvider.CreateScope();
             _configuration = scope.ServiceProvider.GetRequiredService<IConfigurationDAO>();
-
         }
 
         [Fact]
-        public void PegarChave_ChaveExiste_DeveRetornarAChaveDoAppssetings()
+        public void PegarChave_ChaveExiste_DeveRetornarChaveDoAppssetings()
         {
             // Arrange
             string key = "Candidado";
@@ -40,7 +39,7 @@ namespace Kria.Core.Pleno.Test.Ultils
         }
 
         [Fact]
-        public void PegarChave_ChaveNaoExiste_DeveRetornarStringVazia()
+        public void PegarChave_ChaveNaoExiste_DeveRetornarNull()
         {
             // Arrange
             string key = "Aleatorio";
@@ -49,7 +48,7 @@ namespace Kria.Core.Pleno.Test.Ultils
             var NomeCandidado = _configuration.PegarChave(key);
 
             // Assert
-            Assert.Equal("", NomeCandidado);
+            Assert.Equal(null!, NomeCandidado);
             Assert.True(string.IsNullOrEmpty(NomeCandidado));
         }
     }
