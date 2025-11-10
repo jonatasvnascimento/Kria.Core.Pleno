@@ -15,7 +15,10 @@ namespace Kria.Core.Pleno.Lib.Validators
             RuleFor(p => p.GUID)
                 .NotNull().NotEmpty().WithMessage("O campo é obrigatório.");
             RuleFor(p => p.CodigoPracaPedagio)
-                .NotNull().NotEmpty().WithMessage("O campo é obrigatório.");
+                .NotNull()
+                .NotEmpty()
+                .GreaterThan(0)
+                .WithMessage("O campo é obrigatório.");
             RuleFor(p => p.CodigoCabine)
                 .NotNull().NotEmpty().WithMessage("O campo é obrigatório.");
             RuleFor(p => p.Instante)
@@ -36,8 +39,6 @@ namespace Kria.Core.Pleno.Lib.Validators
                 .NotNull().NotEmpty().WithMessage("O campo é obrigatório.");
             RuleFor(p => p.MultiplicadorTarifa)
                 .NotNull()
-                .NotEmpty()
-                .Must(x => x != decimal.MinValue)
                 .WithMessage("O campo é obrigatório.");
 
         }
