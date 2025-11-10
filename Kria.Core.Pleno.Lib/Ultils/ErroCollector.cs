@@ -40,5 +40,6 @@ namespace Kria.Core.Pleno.Lib.Ultils
         }
 
         public string PathLog() => pathCaminho;
+        public int CountErros() => _erros.Count;
     }
 }

@@ -8,6 +8,7 @@ using Kria.Core.Pleno.Lib.Validators;
 using Kria.Core.Pleno.Middleware;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Moq;
 
 namespace Kria.Core.Pleno.Test
 {
@@ -24,6 +25,20 @@ namespace Kria.Core.Pleno.Test
             services.AddSingleton<IConfiguration>(config);
             services.AddSingleton<IConfigurationDAO, Configuration>();
 
+            var mockConfig = new Mock<IConfigurationDAO>();
+            services.AddSingleton(mockConfig.Object);
+
+            services.AddScoped<IPedagioDAO, PedagioDAO>();
+            services.AddScoped<IPedagioBLL, PedagioBLL>();
+            services.AddScoped<IMongoDbContext, MongoDbContext>();
+            services.AddScoped<IErroCollectorDAO, ErroCollector>();
+            services.AddScoped<IPublicarDesafioDAO, PublicarDesafioDAO>();
+
+
+            services.AddSingleton<GlobalErrorHandler>();
+            services.AddScoped<PedagioValidator>();
+            services.AddScoped<RegistroPedagioValidator>();
+            services.AddScoped<HttpClient>();
 
             return services.BuildServiceProvider();
         }
