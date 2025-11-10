@@ -1,0 +1,16 @@
+﻿using Kria.Core.Pleno.Lib.Entidades.DTO.DRegistroPedagioDTO;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Kria.Core.Pleno.Lib.Entidades.DTO.DPedagioDTO;
+
+public class PedagioDTO
+{
+    public string Candidato { get; set; } = string.Empty;
+    public string DataReferencia { get; set; } = string.Empty;
+    public int NumeroArquivo { get; set; }
+    public List<RegistroPedagioDTO> Registros { get; set; } = new();
+}

@@ -9,6 +9,7 @@ using Microsoft.Win32;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -46,7 +47,7 @@ namespace Kria.Core.Pleno.Lib.BLL
 
             pacotesProcessamento = TryGetInt("Configuracoes:PacotesProcessamento", 1000);
             dadosEmMemoria = TryGetInt("Configuracoes:DadosEmMemoria", 10000);
-            threads = TryGetInt("Configuracoes:Threads", Math.Max(1, Environment.ProcessorCount / 2));
+            threads = TryGetInt("Configuracoes:Threads", Environment.ProcessorCount / 2);
             candidato = _configurationDAO.PegarChave("Candidado") ?? string.Empty;
             logError = TryGetInt("Configuracoes:LogError", (int)ESalvarLog.NAO);
         }
@@ -68,7 +69,7 @@ namespace Kria.Core.Pleno.Lib.BLL
                 var loteGrande = _pedagioDAO.ObterLote(ultimaData, dadosEmMemoria).ToList();
                 if (loteGrande.Count == 0) break;
 
-                totalLoteGrande = loteGrande.Count();
+                totalLoteGrande += loteGrande.Count();
                 foreach (var subLote in loteGrande.Chunk(pacotesProcessamento))
                 {
                     var primeiro = subLote[0];
@@ -104,8 +105,9 @@ namespace Kria.Core.Pleno.Lib.BLL
                     ).ConfigureAwait(false);
 
                     totalErro += errosDoLote;
-                    
-                    await _publicarDesafioDAO.PublicarRegistroPedagio(pedagio);
+
+                    if (pedagio.Registros.Count > 0)
+                        await _publicarDesafioDAO.PublicarRegistroPedagio(pedagio);
 
                     totalItemSubLote += pedagio.Registros.Count;
                     Terminal.Mensagem(
@@ -115,7 +117,9 @@ namespace Kria.Core.Pleno.Lib.BLL
                     );
 
                     ultimaData = ultimo.DtCriacao;
-                    await _erroCollectorDAO.SalvarEmDiscoAsync("ErrosPedagio.txt");
+
+                    if (logError == (int)ESalvarLog.SIM)
+                        await _erroCollectorDAO.SalvarEmDiscoAsync("ErrosPedagio.txt");
                 }
             }
 
@@ -141,7 +145,7 @@ namespace Kria.Core.Pleno.Lib.BLL
 
             await Parallel.ForEachAsync(
                 subLote,
-                new ParallelOptions { MaxDegreeOfParallelism = Math.Max(1, threads) },
+                new ParallelOptions { MaxDegreeOfParallelism = threads },
                 async (item, _) =>
                 {
                     int tipoVeiculo = Random.Shared.Next(1, 3);
@@ -149,17 +153,17 @@ namespace Kria.Core.Pleno.Lib.BLL
                     var registro = new RegistroPedagio
                     {
                         GUID = Guid.NewGuid().ToString(),
-                        CodigoPracaPedagio = item.CodigoPracaPedagio,
-                        CodigoCabine = item.CodigoCabine.ToString(),
+                        CodigoPracaPedagio = int.TryParse(item.CodigoPracaPedagio, out var codigo) ? codigo : 0,
+                        CodigoCabine = item.CodigoCabine,
                         Instante = item.Instante,
-                        Sentido = item.Sentido.ToString(),
-                        TipoVeiculo = tipoVeiculo.ToString(),
-                        Isento = item.Isento.ToString(),
-                        Evasao = item.Evasao.ToString(),
-                        TipoCobrancaEfetuada = item.TipoCobranca.ToString(),
-                        ValorDevido = item.ValorDevido.ToString(),
-                        ValorArrecadado = item.ValorArrecadado.ToString(),
-                        MultiplicadorTarifa = PedagioMultiplicadorTarifa.Calcular(tipoVeiculo, item.Isento).ToString()
+                        Sentido = item.Sentido,
+                        TipoVeiculo = (int)ETipoVeiculo.Comercial,
+                        Isento = item.Isento,
+                        Evasao = item.Evasao,
+                        TipoCobrancaEfetuada = item.TipoCobranca,
+                        ValorDevido = item.ValorDevido,
+                        ValorArrecadado = item.ValorArrecadado,
+                        MultiplicadorTarifa = (decimal)PedagioMultiplicadorTarifa.Calcular(tipoVeiculo, item.Isento)
                     };
 
                     var result = await registroPedagioValidator.ValidateAsync(registro).ConfigureAwait(false);

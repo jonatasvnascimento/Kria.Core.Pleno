@@ -1,4 +1,5 @@
 ﻿using Kria.Core.Pleno.Lib.Entidades;
+using Kria.Core.Pleno.Lib.Entidades.DTO.DPedagioDTO;
 using Kria.Core.Pleno.Lib.Interfaces.DAO;
 using Kria.Core.Pleno.Lib.Ultils;
 using System;
@@ -30,8 +31,10 @@ namespace Kria.Core.Pleno.Lib.DAO
 
         public async Task PublicarRegistroPedagio(Pedagio registroPedagio)
         {
+            var resgistro = PedagioDTOMapper.Map(registroPedagio);
+
             var url = $"{_urlBase}/Candidato/PublicarDesafio";
-            var json = JsonSerializer.Serialize(registroPedagio, _jsonOptions);
+            var json = JsonSerializer.Serialize(resgistro, _jsonOptions);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
             using var response = await _httpClient.PostAsync(url, content);

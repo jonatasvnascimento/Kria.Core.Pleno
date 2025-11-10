@@ -37,7 +37,7 @@ namespace Kria.Core.Pleno.Lib.Validators
             RuleFor(p => p.MultiplicadorTarifa)
                 .NotNull()
                 .NotEmpty()
-                .Must(x => string.IsNullOrEmpty(x) || (double.TryParse(x, out var v) && v != double.MinValue))
+                .Must(x => x != decimal.MinValue)
                 .WithMessage("O campo é obrigatório.");
 
         }
