@@ -16,7 +16,7 @@ namespace Kria.Core.Pleno.Test.Performance
     public class PedagioPerformanceTests
     {
         [Fact]
-        public async Task ProcessarSubLoteAsync_DeveProcessarUmMilhaoDeRegistros_ComPerformanceAceitavel()
+        public async Task ProcessarSubLoteAsync_DeveProcessarRegistros_ComPerformanceAceitavel()
         {
             // Arrange
             const int total = 10_000_000;
