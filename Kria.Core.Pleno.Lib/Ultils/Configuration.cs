@@ -10,6 +10,6 @@ namespace Kria.Core.Pleno.Lib.Ultils
 {
     public class Configuration(IConfiguration configuration) : IConfigurationDAO
     {
-        public string? PegarChave(string chave) => configuration.GetSection(chave).Value;
+        public string? PegarChave(string chave) => configuration.GetSection(chave).Value ?? string.Empty;
     }
 }
