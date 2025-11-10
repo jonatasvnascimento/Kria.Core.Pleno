@@ -41,7 +41,7 @@ namespace Kria.Core.Pleno.Lib.DAO
             var respostaApi = await response.Content.ReadAsStringAsync();
 
             if (response.IsSuccessStatusCode)
-                Terminal.Mensagem($"Registro de pedágio publicado com sucesso.", "Enviado API: ", ConsoleColor.Magenta);
+                Terminal.Mensagem($"Registro de pedágio publicado com sucesso: Status:{(int)response.StatusCode}.", "Enviado API: ", ConsoleColor.Magenta);
             else
                 Terminal.Mensagem($"Erro ao publicar registro de pedágio ({response.StatusCode}): {respostaApi}", "Enviado API: ", ConsoleColor.Red);
         }
